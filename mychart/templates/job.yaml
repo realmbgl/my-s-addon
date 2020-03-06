@@ -35,6 +35,9 @@ spec:
               echo ">>> get helm-chart";
               eval "$(jq -r '.install.helm."helm-chart"' system.json)";
               echo ">>> get helm-values";
+              eval "$(jq -r '.install.helm."helm-values"' system.json)";
+              echo ">>> helm install styra-system";
+              eval "$(jq -r '.install.helm."helm-install"' system.json)"              
           volumeMounts:
             - name: styra-access
               mountPath: "/styra/access"
