@@ -1,0 +1,22 @@
+---
+apiVersion: kubeaddons.mesosphere.io/v1beta1
+kind: ClusterAddon
+metadata:
+  name: styra
+  labels:
+    kubeaddons.mesosphere.io/name: styra
+  annotations:
+    catalog.kubeaddons.mesosphere.io/addon-revision: "1.0.0-1"
+    appversion.kubeaddons.mesosphere.io/styra: "1.0.0"
+    values.chart.helm.kubeaddons.mesosphere.io/styra: "https://raw.githubusercontent.com/realmbgl/my-s-addon/master/mychart/values.yaml"
+spec:
+  namespace: kubeaddons
+  kubernetes:
+    minSupportedVersion: v1.15.6
+  cloudProvider:
+    - name: aws
+      enabled: true
+  chartReference:
+    chart: mychart
+    repo: https://realmbgl.github.io/my-s-addon/
+    version: 0.1.0
