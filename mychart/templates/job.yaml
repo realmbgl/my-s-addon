@@ -1,0 +1,45 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: styra-secret
+  namespace: kubeaddons
+type: Opaque
+stringData:
+  config: |-
+    organization_id: {{ .Values.credentials.organization_id }}
+    username: {{ .Values.credentials.username }}
+    password: {{ .Values.credentials.password }}
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: styra-deploy
+  namespace: kubeaddons
+spec:
+  template:
+    spec:
+      serviceAccountName: kubeaddons-controller-manager
+      restartPolicy: Never
+      containers:
+        - name: styra-deploy
+          image: realmbgl/scontrol
+          command: ["/bin/sh", "-c"]
+          args:
+            - CLUSTER_NAME=$(kubectl get configmap kubeadm-config -n kube-system -o yaml | grep clusterName | cut -d ":" -f 2 | awk '$1=$1');
+              echo ">>> styra create system for cluster "$CLUSTER_NAME;
+              styra create system --output=json --name=$CLUSTER_NAME --type=kubernetes --config=./access/config > system.json;
+              echo ">>> set labels";
+              eval "$(jq -r '.install.helm.labels' system.json)";
+              echo ">>> get helm-chart";
+              eval "$(jq -r '.install.helm."helm-chart"' system.json)";
+              echo ">>> get helm-values";
+          volumeMounts:
+            - name: styra-access
+              mountPath: "/styra/access"
+              readOnly: true
+      volumes:
+        - name: styra-access
+          secret:
+            secretName: styra-secret
