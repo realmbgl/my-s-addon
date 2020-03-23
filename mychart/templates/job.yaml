@@ -8,8 +8,7 @@ type: Opaque
 stringData:
   config: |-
     organization_id: {{ .Values.credentials.organization_id }}
-    username: {{ .Values.credentials.username }}
-    password: {{ .Values.credentials.password }}
+    token: {{ .Values.credentials.token }}
 
 ---
 apiVersion: batch/v1
@@ -37,7 +36,7 @@ spec:
               echo ">>> get helm-values";
               eval "$(jq -r '.install.helm."helm-values"' system.json)";
               echo ">>> helm install styra-system";
-              eval "$(jq -r '.install.helm."helm-install"' system.json)"              
+              eval "$(jq -r '.install.helm."helm-install"' system.json)"
           volumeMounts:
             - name: styra-access
               mountPath: "/styra/access"
